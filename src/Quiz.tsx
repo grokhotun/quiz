@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View, StyleSheet, Button} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {useQuiz} from './hooks';
 
@@ -27,15 +27,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 8,
   },
-  buttons: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
 });
 
-export const Quiz = () => {
+export const Quiz = ({navigation}) => {
   const [data, loading, error, append] = useQuiz();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -52,20 +46,12 @@ export const Quiz = () => {
     setCurrentQuestionIndex(currentQuestionIndex + 1);
   };
 
-  const prevQuestion = () => {
-    if (currentQuestionIndex < data.length - 1) {
-      setCurrentQuestionIndex(0);
-      return;
-    }
-
-    setCurrentQuestionIndex(currentQuestionIndex - 1);
-  };
-
   const handleAnswer = (option) => {
     if (currentQuestionIndex === data.length - 1) {
       setCurrentQuestionIndex(0);
       append(answers);
       setAnswers([]);
+      navigation.navigate('Thankyou');
       return;
     }
 
@@ -91,14 +77,13 @@ export const Quiz = () => {
       <View>
         <Text style={styles.title}>{currentQuestion.title}</Text>
         {currentQuestion.options.map((option) => (
-          <View key={option.id} style={styles.option}>
-            <Text onPress={() => handleAnswer(option)}>{option.title}</Text>
-          </View>
+          <TouchableOpacity
+            key={option.id}
+            style={styles.option}
+            onPress={() => handleAnswer(option)}>
+            <Text>{option.title}</Text>
+          </TouchableOpacity>
         ))}
-      </View>
-      <View style={styles.buttons}>
-        <Button onPress={prevQuestion} title="Назад" />
-        <Button onPress={nextQuestion} title="Дальше" />
       </View>
     </View>
   );
